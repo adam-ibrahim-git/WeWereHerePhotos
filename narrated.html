@@ -13,7 +13,7 @@
   .bar{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--line);}
   .bar .eyebrow{font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:0;}
   .bar .title{font-family:Georgia,"Times New Roman",serif;font-size:1.12rem;margin:2px 0 0;color:var(--offwhite);}
-  .bar .shuffle{margin-left:auto;display:inline-flex;align-items:center;gap:7px;font-size:.72rem;color:var(--lavender);border:1px solid var(--line);border-radius:20px;padding:6px 13px;background:rgba(201,162,75,.08);}
+  .bar .shuffle{margin-left:auto;display:inline-flex;align-items:center;gap:7px;font-size:.72rem;color:var(--lavender);border:1px solid var(--line);border-radius:20px;padding:6px 13px;background:rgba(201,162,75,.08);white-space:nowrap;}
   .bar .shuffle svg{width:15px;height:15px;fill:var(--gold);}
   .stage{position:relative;width:100%;aspect-ratio:16/9;background:#1c1030;}
   .stage iframe,.stage #ytplayer{position:absolute;inset:0;width:100%;height:100%;border:0;}
@@ -33,18 +33,23 @@
       <span class="shuffle"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3l4 4-4 4v-3h-2.5l-2.3 3-1.8-2.4L12.6 8H14.5V6H17V3zM3 6h4.5l2.3 3 1.2-1.6L9.4 6H3v0zm0 12h4.5l9.5-12H14v-3l-4 4 4 4V8h-2.5L3 18H3v0z"/></svg>Shuffled</span>
     </div>
     <div class="stage"><div id="ytplayer"></div></div>
-    <div class="foot">A shuffled stream of the community's <b>narrated photographs</b> — each image told in the voice of someone who was there. Use the player's controls to skip ahead or go back; every photo has its own full record, story, and transcript in the Archive.</div>
+    <div class="foot">A shuffled stream of the community's <b>narrated photographs</b> &mdash; each image told in the voice of someone who was there. Press play, then use the controls to skip ahead or step back.</div>
   </div>
 </div>
 <script>
+  // All 151 narrated-photograph videos, in reload-shuffled order.
+  var IDS=["-Fd1hsO4mvM","NZU2yN4aOkE","uNdV2jbQVSc","fSw-Nk8FX0U","1q3jNijDs-o","MBQNkdQCwj0","f7uQ90gPNEg","OQ-ihhrEuK8","lL1RoN8T6jc","J_ooD52KFrA","lpe5N0CxBdI","AkGXFx8-43g","fMW-KCIQogs","PC9s50W8OGI","5OXCh1W7yn4","GIfm2-i-Kzo","a3xGhJTdV7k","BUWoKGAJR1w","HJ4GEMH_dhw","cBJM-ZNsu2Y","lnKVQeU90aU","2aRhpbHNH4A","zhJr93gQJIU","FpwgSz8VQpk","RL1oXvSHFIE","axPxiLF-ank","24NcPul-bP4","eLfMkk_jvpA","8zO_tL7Ys2c","KLsJZfi7oTI","eDCrg7Ocrm4","kRfCitnS0PI","cs-ue5OXs8k","W0eyko0Ql3E","lvUq9QiLSm0","teGb0dxEAOo","x9P4zuMgWT8","l6eqE6GDabk","6YQ2oNOXwiw","EfG589URxns","GXNb0Z6yKsY","6-CH4tUljAQ","X4AMM-vzAAc","TQEhnY8tEdA","Druh8dQWXaE","P6PTVNgpfK0","VoyGDQEdHOs","yH405zOllBE","E3PmWXkxGuQ","BC4Hh08TpJM","vmPnRdR5Ld0","Y__HGevebh0","-8HGXkHHn_4","MgC9bv06CNY","70modDxpx6E","IRVO7YGZID4","ESJos5vKns8","h5LLnGXFVtg","0h0es5ZdNQM","HQQXIh6iRJ0","sqfds3joUXk","IRWjq2HK0c0","nIWnfWpqlDI","yJH6dCot178","1npUTl-ER1o","fT7jJ9mHxpI","gc6PQI9U6MQ","CbKsBq_boL0","ln-EmTJOeok","R0GIgq26M4U","Apn9mSSp5vE","TdJnaI6CSQw","LW5Re3Bh8uw","iAiZQzkvHGQ","T3jpft1iQkk","hk6i3oERzpI","JEgeG_lKliM","AYsQzypeXks","WcySP8lnk_g","zxA-ex_329A","pBrWkCY_7w0","H1pAIE3feUI","TxN2pCkchE8","1I6vFY5KQuU","UIIhS9Y1TIE","0x-iq7tjLJY","rUf7s4uRUW8","3P5BZcupWFw","GCFHC07aSyQ","Gz5L9DgWLI4","Dyb7VNZeKrs","CAIY__ceBPA","pinbpAdKNto","myl6AtpFrZ8","c0cG6nrGELY","dox1ChfB4Ks","D0GjILqtxxQ","yskvCrCor4Q","EcvdyrabSnM","P3wTJ9XHSrk","nisejL0WLFI","vMJ-44Dnmu8","qyMIggpKFI4","i35Rj8GuJvM","j5Grz6Q4Wr0","q9NY1CRr7tk","cwgkH3qQykU","q9f0rYWD2t4","QMQdWe5ktqA","4eShfJY3P4E","KVJXzxZcnL4","XfQq4a5oVnU","xYqh1DtTfow","YIjU6iq6ktA","4J-uz1mc2bk","fI_dd5O-NDU","WKLmAsSDtlQ","fREW7LVNKBw","k0dK5vrRtJ8","k6-p3ARK5Pk","nYrm4Z21jIQ","ORBvkvETGDk","FT9IpwMKoCE","leiCm5v180w","KKGmazc7h1M","OCzcTfMdTcM","XCGnJS2b910","FZfoaMPb3Ak","BrPJALgEQY8","Od-mx-8xDOU","9zUYQYzOM8w","rcpuC95gfhc","9y4q3m1xLDI","G9v0yWYxqdM","p2SSdh2Ayf0","LdM1PLogAz8","N1dLL7BMgwQ","BZV0ucZY2gw","QHQS8TNOst0","poxQ1pb5FgI","5AIqKwcbjKg","fmW8lQIJVBU","8tLYhc7YJSs","1stO3bsco_M","RClkSYyMee8","75STz-ia8zY","WWkNNli3Qxo","oulLVhXNHrM","pE7FPTvM2Tc","mkIGvbBPhaw","YtnprlsPqUw"];
+  // Fisher-Yates shuffle so the order is different every visit.
+  for(var i=IDS.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=IDS[i];IDS[i]=IDS[j];IDS[j]=t;}
   var tag=document.createElement('script');
   tag.src="https://www.youtube.com/iframe_api";
   document.head.appendChild(tag);
   var player;
   function onYouTubeIframeAPIReady(){
     player=new YT.Player('ytplayer',{
-      playerVars:{listType:'playlist',list:'NZU2yN4aOkE',rel:0,modestbranding:1,autoplay:0,playsinline:1},
-      events:{ onReady:function(e){ try{ e.target.setShuffle(true); e.target.setLoop(true); }catch(err){} } }
+      videoId:IDS[0],
+      playerVars:{playlist:IDS.slice(1).join(','),rel:0,modestbranding:1,autoplay:0,playsinline:1,loop:1},
+      events:{ onReady:function(e){ try{ e.target.setLoop(true); }catch(err){} } }
     });
   }
 </script>
