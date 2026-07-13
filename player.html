@@ -19,7 +19,7 @@
     --sans:'Source Sans 3',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
   *{box-sizing:border-box}
-  html,body{margin:0;padding:0;height:100%}
+  html,body{margin:0;padding:0}
   body{
     background:var(--aubergine);
     color:var(--offwhite);
@@ -28,19 +28,31 @@
     line-height:1.5;
     overflow-x:hidden;
   }
-  .wrap{
-    max-width:640px;margin:0 auto;min-height:100%;
-    display:flex;flex-direction:column;
-    padding:14px 14px 18px;
+  .wrap{ max-width:720px;margin:0 auto;padding:0; }
+  /* -------- Card shell (matches the Narrated Photographs player) -------- */
+  .shell{
+    background:linear-gradient(160deg,#341d55,#241238);
+    border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    box-shadow:0 10px 34px rgba(0,0,0,.32);
   }
-  /* -------- Stage (photo) -------- */
+  .bar{display:flex;align-items:center;gap:11px;padding:12px 16px;border-bottom:1px solid var(--line);}
+  .backmini{flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:rgba(201,162,75,.10);color:var(--lavender);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:border-color .15s,color .15s,background .15s;}
+  .backmini:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,162,75,.18)}
+  .backmini:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .backmini svg{width:18px;height:18px}
+  .barhead{min-width:0;flex:1 1 auto}
+  .barhead .eyebrow2{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:0}
+  .barhead .barttl{font-family:var(--serif);font-weight:600;font-size:1.12rem;line-height:1.2;margin:2px 0 0;color:var(--offwhite);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .chip{flex:none;display:inline-flex;align-items:center;gap:7px;font-size:.72rem;color:var(--lavender);border:1px solid var(--line);border-radius:20px;padding:6px 12px;background:rgba(201,162,75,.08);white-space:nowrap}
+  .chip svg{width:14px;height:14px;fill:var(--gold)}
+  .foot{padding:12px 16px;font-size:.8rem;color:var(--lavender);border-top:1px solid var(--line);line-height:1.45}
+  .foot b{color:var(--offwhite);font-weight:600}
+  /* -------- Stage (photo) — flush inside the card -------- */
   .stage{
     position:relative;width:100%;
     aspect-ratio:4/3;
     background:linear-gradient(160deg,#3a2159,#241238);
-    border:1px solid var(--line);
-    border-radius:14px;overflow:hidden;
-    box-shadow:0 8px 30px rgba(0,0,0,.35);
+    overflow:hidden;
   }
   .stage .frame{position:absolute;inset:0}
   /* blurred, dimmed copy of the current photo fills the frame behind it,
@@ -120,11 +132,10 @@
   .bigplay:hover{background:rgba(201,162,75,.26);transform:scale(1.05)}
   .bigplay:active{transform:scale(.97)}
   .bigplay svg{width:34px;height:34px;margin-left:4px}
-  /* -------- Transport controls -------- */
+  /* -------- Transport controls — flush inside the card -------- */
   .panel{
-    margin-top:14px;background:var(--purple-soft);
-    border:1px solid var(--line);border-radius:12px;
-    padding:12px 14px 14px;
+    background:transparent;border:none;border-radius:0;margin:0;
+    padding:12px 16px 15px;
   }
   .counter{
     display:flex;justify-content:space-between;align-items:baseline;
@@ -177,14 +188,8 @@
   .ctl.play:hover{background:rgba(201,162,75,.2)}
   .ctl.play svg{width:28px;height:28px}
   .ctl.play svg.ico-play{margin-left:3px}
-  /* -------- Theme picker (no ?theme=) -------- */
-  .picker{padding:22px 4px 8px}
-  .picker h1{
-    font-family:var(--serif);font-size:1.5rem;margin:0 0 4px;text-align:center;
-  }
-  .picker p.lead{
-    text-align:center;color:var(--lavender);font-size:.86rem;margin:0 auto 18px;max-width:36ch;
-  }
+  /* -------- Theme picker (no ?theme=) — the card body -------- */
+  .picker{padding:16px}
   .picker .grid{display:flex;flex-direction:column;gap:9px}
   .picker a.card{
     display:flex;justify-content:space-between;align-items:center;gap:10px;
@@ -272,10 +277,25 @@
     play:  '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>',
     pause: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>',
     next:  '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5l9 7-9 7V5zm10 0h2v14h-2z"/></svg>',
-    prev:  '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 5l-9 7 9 7V5zM6 5h2v14H6z"/></svg>'
+    prev:  '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 5l-9 7 9 7V5zM6 5h2v14H6z"/></svg>',
+    back:  '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z"/></svg>',
+    shuf:  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3l4 4-4 4v-3h-2.5l-2.3 3-1.8-2.4L12.6 8H14.5V6H17V3zM3 6h4.5l2.3 3 1.2-1.6L9.4 6H3zm0 12h4.5l9.5-12H14V3l4 4-4 4V8h-2.5L3 18z"/></svg>'
   };
 
   var app = document.getElementById("app");
+
+  /* --- report card height to a hosting page so it can size the iframe exactly --- */
+  function reportHeight(){
+    try{
+      var sh=document.querySelector(".shell");
+      var h=sh?Math.ceil(sh.getBoundingClientRect().height):Math.ceil(document.body.scrollHeight);
+      if(window.parent && window.parent!==window){ window.parent.postMessage({wwhMemoriesHeight:h},"*"); }
+    }catch(e){}
+  }
+  window.addEventListener("load",reportHeight);
+  window.addEventListener("resize",function(){ clearTimeout(window.__rt2); window.__rt2=setTimeout(reportHeight,150); });
+  setTimeout(reportHeight,500); setTimeout(reportHeight,1500);
+  if(document.fonts && document.fonts.ready){ document.fonts.ready.then(reportHeight); }
 
   /* ---------------- load data ---------------- */
   fetch(DATA_URL, {cache:"no-cache"})
@@ -306,9 +326,16 @@
   /* ---------------- theme picker ---------------- */
   function buildPicker(stations){
     app.innerHTML="";
-    var wrap=el("div",{class:"picker"});
-    wrap.appendChild(el("h1",{text:"Narrated Memories of Danville"}));
-    wrap.appendChild(el("p",{class:"lead",text:"Choose a theme to listen. Each one shuffles through oral-history recordings from the community."}));
+    var shell=el("div",{class:"shell"});
+    var bar=el("div",{class:"bar"});
+    var head=el("div",{class:"barhead"});
+    head.appendChild(el("p",{class:"eyebrow2",text:"Narrated Memories"}));
+    head.appendChild(el("p",{class:"barttl",text:"Choose a theme to listen"}));
+    bar.appendChild(head);
+    bar.appendChild(el("span",{class:"chip",html:ICON.shuf+"Shuffled"}));
+    shell.appendChild(bar);
+
+    var body=el("div",{class:"picker"});
     var grid=el("div",{class:"grid"});
     stations.forEach(function(s){
       var a=el("a",{class:"card",href:"?theme="+encodeURIComponent(s.slug),"aria-label":s.title+", "+s.clips.length+" clips"});
@@ -316,21 +343,33 @@
       a.appendChild(el("span",{class:"c",text:s.clips.length+" clips"}));
       grid.appendChild(a);
     });
-    wrap.appendChild(grid);
-    app.appendChild(wrap);
+    body.appendChild(grid);
+    shell.appendChild(body);
+
+    shell.appendChild(el("div",{class:"foot",html:"Each theme shuffles through the community’s oral-history recordings — every clip paired with a photograph from the collection."}));
+    app.appendChild(shell);
+    reportHeight();
   }
 
   /* ---------------- player ---------------- */
   function buildPlayer(station){
     app.innerHTML="";
-    var backBtn=el("button",{class:"backbtn","aria-label":"Back to all themes",html:"← All themes"});
-    backBtn.addEventListener("click",function(){ try{audio&&audio.pause();}catch(e){} location.href=location.pathname; });
-    app.appendChild(backBtn);
 
     // ----- photo pool -----
     var themePhotos = (station.photos||[]).slice();
 
-    // ----- DOM -----
+    // ----- card shell + header bar -----
+    var shell = el("div",{class:"shell"});
+    var bar = el("div",{class:"bar"});
+    var back = el("button",{class:"backmini","aria-label":"Back to all themes",html:ICON.back});
+    back.addEventListener("click",function(){ try{audio&&audio.pause();}catch(e){} location.href=location.pathname; });
+    var head = el("div",{class:"barhead"});
+    head.appendChild(el("p",{class:"eyebrow2",text:"Narrated Memories"}));
+    head.appendChild(el("p",{class:"barttl",text:station.title,title:station.title}));
+    bar.appendChild(back); bar.appendChild(head);
+    bar.appendChild(el("span",{class:"chip",html:ICON.shuf+"Shuffled"}));
+
+    // ----- stage (photo) -----
     var stage = el("div",{class:"stage"});
     var bg = el("div",{class:"stage-bg"});
     var imgA = el("img",{alt:"",decoding:"async"});
@@ -343,11 +382,9 @@
     caption.appendChild(titleEl); caption.appendChild(speakerEl);
 
     var overlay = el("div",{class:"overlay"});
-    overlay.appendChild(el("p",{class:"station-eyebrow",text:"Narrated Memories"}));
-    overlay.appendChild(el("h1",{class:"station-name",text:station.title}));
-    overlay.appendChild(el("p",{class:"station-sub",text:station.clips.length+" oral-history clips — press play to begin"}));
     var bigBtn = el("button",{class:"bigplay","aria-label":"Play "+station.title,html:ICON.play});
     overlay.appendChild(bigBtn);
+    overlay.appendChild(el("p",{class:"station-sub",text:station.clips.length+" oral-history clips — press play"}));
 
     stage.appendChild(bg);
     stage.appendChild(frame);
@@ -358,7 +395,7 @@
     // ----- transport panel -----
     var panel = el("div",{class:"panel"});
     var counter = el("div",{class:"counter"});
-    var nowLbl = el("span",{class:"now",text:station.title});
+    var nowLbl = el("span",{class:"now",text:"Now playing"});
     var idxLbl = el("span",{class:"idx",text:""});
     counter.appendChild(nowLbl); counter.appendChild(idxLbl);
 
@@ -383,9 +420,12 @@
     // are a different origin without CORS headers; a plain media load plays fine.
     var audio = el("audio",{preload:"none","aria-label":"Oral history audio player"});
 
-    app.appendChild(stage);
-    app.appendChild(panel);
+    shell.appendChild(bar);
+    shell.appendChild(stage);
+    shell.appendChild(panel);
+    app.appendChild(shell);
     app.appendChild(audio);
+    reportHeight();
 
     /* ---------------- state ---------------- */
     var order = [];         // shuffled indices into station.clips
@@ -480,7 +520,6 @@
       titleEl.textContent = clip.title;
       speakerEl.textContent = clip.speaker ? clip.speaker : "";
       idxLbl.textContent = (pos+1)+" of "+order.length;
-      nowLbl.textContent = station.title;
       curT.textContent="0:00"; durT.textContent="0:00";
       setScrub(0);
       setPhotoContext(clip);
