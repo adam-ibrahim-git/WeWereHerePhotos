@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>We Were Here — Narrated Memories</title>
+<style>
+  /* ---- Brand palette ----
+     aubergine bg #2E1A47 | Bate purple #512A80 | gold #C9A24B
+     off-white text #F5F2FA | lavender secondary #BEB0D6           */
+  :root{
+    --aubergine:#2E1A47; --purple:#512A80; --gold:#C9A24B;
+    --offwhite:#F5F2FA; --lavender:#BEB0D6;
+    --purple-soft:#3d2160; --line:rgba(190,176,214,.28);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;height:100%}
+  body{
+    background:var(--aubergine);
+    color:var(--offwhite);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.45;
+    overflow-x:hidden;
+  }
+  .wrap{
+    max-width:640px;margin:0 auto;min-height:100%;
+    display:flex;flex-direction:column;
+    padding:14px 14px 18px;
+  }
+  /* -------- Stage (photo) -------- */
+  .stage{
+    position:relative;width:100%;
+    aspect-ratio:4/3;
+    background:linear-gradient(160deg,#3a2159,#241238);
+    border:1px solid var(--line);
+    border-radius:14px;overflow:hidden;
+    box-shadow:0 8px 30px rgba(0,0,0,.35);
+  }
+  .stage .frame{position:absolute;inset:0}
+  .stage img{
+    position:absolute;inset:0;width:100%;height:100%;
+    object-fit:cover;object-position:center;
+    opacity:0;transition:opacity 1.1s ease;
+    will-change:opacity;
+  }
+  .stage img.show{opacity:1}
+  /* gentle vignette + gradient so title text is legible over any photo */
+  .stage::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:
+      radial-gradient(120% 90% at 50% 8%, rgba(0,0,0,0) 40%, rgba(46,26,71,.15) 100%),
+      linear-gradient(to top, rgba(20,10,34,.86) 0%, rgba(20,10,34,.30) 34%, rgba(20,10,34,0) 55%);
+  }
+  .caption{
+    position:absolute;left:0;right:0;bottom:0;z-index:2;
+    padding:14px 16px 13px;
+  }
+  .clip-title{
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:1.18rem;line-height:1.28;margin:0 0 3px;
+    color:var(--offwhite);text-shadow:0 1px 6px rgba(0,0,0,.6);
+  }
+  .clip-speaker{
+    font-size:.82rem;letter-spacing:.02em;color:var(--lavender);
+    text-shadow:0 1px 4px rgba(0,0,0,.6);margin:0;
+  }
+  .photo-credit{
+    position:absolute;top:8px;right:10px;z-index:2;
+    font-size:.64rem;color:rgba(245,242,250,.62);
+    background:rgba(20,10,34,.42);padding:2px 7px;border-radius:20px;
+    max-width:70%;text-align:right;
+    text-shadow:0 1px 3px rgba(0,0,0,.5);
+    opacity:0;transition:opacity .5s;
+  }
+  .photo-credit.show{opacity:1}
+  /* big centered play overlay before first play */
+  .overlay{
+    position:absolute;inset:0;z-index:3;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:14px;text-align:center;padding:20px;
+    background:linear-gradient(160deg,rgba(46,26,71,.62),rgba(36,18,56,.72));
+    transition:opacity .45s;
+  }
+  .overlay.hide{opacity:0;pointer-events:none}
+  .overlay .station-eyebrow{
+    font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--gold);margin:0;
+  }
+  .overlay .station-name{
+    font-family:Georgia,serif;font-size:1.5rem;margin:0;color:var(--offwhite);
+    max-width:22ch;
+  }
+  .overlay .station-sub{
+    font-size:.82rem;color:var(--lavender);margin:0;max-width:34ch;
+  }
+  .bigplay{
+    margin-top:4px;width:76px;height:76px;border-radius:50%;
+    border:2px solid var(--gold);
+    background:rgba(201,162,75,.14);
+    color:var(--gold);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:transform .15s ease,background .2s;
+  }
+  .bigplay:hover{background:rgba(201,162,75,.26);transform:scale(1.05)}
+  .bigplay:active{transform:scale(.97)}
+  .bigplay svg{width:34px;height:34px;margin-left:4px}
+  /* -------- Transport controls -------- */
+  .panel{
+    margin-top:14px;background:var(--purple-soft);
+    border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px 14px;
+  }
+  .counter{
+    display:flex;justify-content:space-between;align-items:baseline;
+    font-size:.74rem;color:var(--lavender);margin-bottom:9px;
+    letter-spacing:.02em;
+  }
+  .counter .now{color:var(--offwhite);font-weight:600}
+  .scrub{
+    --pct:0%;
+    -webkit-appearance:none;appearance:none;width:100%;height:22px;
+    background:transparent;cursor:pointer;display:block;margin:0;
+  }
+  .scrub:focus{outline:none}
+  .scrub:focus-visible{outline:2px solid var(--gold);outline-offset:4px;border-radius:6px}
+  .scrub::-webkit-slider-runnable-track{
+    height:6px;border-radius:6px;
+    background:linear-gradient(to right,var(--gold) var(--pct),rgba(190,176,214,.28) var(--pct));
+  }
+  .scrub::-moz-range-track{height:6px;border-radius:6px;background:rgba(190,176,214,.28)}
+  .scrub::-moz-range-progress{height:6px;border-radius:6px;background:var(--gold)}
+  .scrub::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;margin-top:-6px;
+    width:18px;height:18px;border-radius:50%;background:var(--gold);
+    border:2px solid #2E1A47;box-shadow:0 1px 4px rgba(0,0,0,.5);
+  }
+  .scrub::-moz-range-thumb{
+    width:16px;height:16px;border-radius:50%;background:var(--gold);
+    border:2px solid #2E1A47;
+  }
+  .times{
+    display:flex;justify-content:space-between;
+    font-size:.68rem;color:var(--lavender);margin-top:2px;
+    font-variant-numeric:tabular-nums;
+  }
+  .controls{
+    display:flex;align-items:center;justify-content:center;gap:20px;
+    margin-top:8px;
+  }
+  .ctl{
+    background:none;border:none;color:var(--offwhite);cursor:pointer;
+    padding:8px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    transition:color .15s,background .15s;
+  }
+  .ctl:hover{color:var(--gold);background:rgba(201,162,75,.12)}
+  .ctl:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .ctl svg{width:26px;height:26px}
+  .ctl.play{
+    width:58px;height:58px;border:2px solid var(--gold);color:var(--gold);
+  }
+  .ctl.play:hover{background:rgba(201,162,75,.2)}
+  .ctl.play svg{width:28px;height:28px}
+  .ctl.play svg.ico-play{margin-left:3px}
+  /* -------- Theme picker (no ?theme=) -------- */
+  .picker{padding:22px 4px 8px}
+  .picker h1{
+    font-family:Georgia,serif;font-size:1.5rem;margin:0 0 4px;text-align:center;
+  }
+  .picker p.lead{
+    text-align:center;color:var(--lavender);font-size:.86rem;margin:0 auto 18px;max-width:36ch;
+  }
+  .picker .grid{display:flex;flex-direction:column;gap:9px}
+  .picker a.card{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    text-decoration:none;color:var(--offwhite);
+    background:var(--purple-soft);border:1px solid var(--line);
+    border-radius:10px;padding:13px 15px;transition:border-color .15s,background .15s;
+  }
+  .picker a.card:hover{border-color:var(--gold);background:#452573}
+  .picker a.card .t{font-family:Georgia,serif;font-size:1.02rem}
+  .picker a.card .c{font-size:.72rem;color:var(--lavender);white-space:nowrap}
+  .picker a.card:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  /* -------- misc -------- */
+  .status{
+    text-align:center;color:var(--lavender);font-size:.82rem;
+    padding:40px 20px;font-family:Georgia,serif;
+  }
+  .status.err{color:#e8b8b8}
+  .visually-hidden{
+    position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;
+    overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+  }
+  .loading-dots::after{content:"";animation:dots 1.4s steps(4,end) infinite}
+  @keyframes dots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
+  @media (max-width:360px){
+    .wrap{padding:10px 10px 14px}
+    .clip-title{font-size:1.06rem}
+    .controls{gap:14px}
+    .overlay .station-name{font-size:1.3rem}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .stage img{transition:opacity .01s}
+    .overlay{transition:none}
+  }
+.backbtn{display:inline-flex;align-items:center;gap:6px;background:rgba(201,162,75,.10);border:1px solid var(--line);color:var(--lavender);padding:8px 15px;border-radius:22px;cursor:pointer;font-size:.82rem;font-family:inherit;margin:0 0 12px;transition:border-color .15s,color .15s,background .15s}
+  .backbtn:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,162,75,.18)}
+  .backbtn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="status" id="boot">Loading the recordings<span class="loading-dots"></span></div>
+</div>
+
+<script>
+"use strict";
+(function(){
+  /* ---------------- config ---------------- */
+  var PHOTO_ROTATE_MS = 7000;          // gentle cross-fade interval for theme photos
+  var DATA_URL = "stations.json";
+
+  /* ---------------- helpers ---------------- */
+  function qs(name){
+    var m = new RegExp("[?&]"+name+"=([^&]*)").exec(location.search);
+    return m ? decodeURIComponent(m[1].replace(/\+/g," ")) : null;
+  }
+  function el(tag, attrs, kids){
+    var e = document.createElement(tag);
+    if(attrs) for(var k in attrs){
+      if(k==="class") e.className=attrs[k];
+      else if(k==="html") e.innerHTML=attrs[k];
+      else if(k==="text") e.textContent=attrs[k];
+      else e.setAttribute(k, attrs[k]);
+    }
+    (kids||[]).forEach(function(c){ if(c) e.appendChild(c); });
+    return e;
+  }
+  function fmt(t){
+    if(!isFinite(t)||t<0) t=0;
+    var m=Math.floor(t/60), s=Math.floor(t%60);
+    return m+":"+(s<10?"0":"")+s;
+  }
+  // Fisher–Yates
+  function shuffle(a){
+    a=a.slice();
+    for(var i=a.length-1;i>0;i--){
+      var j=Math.floor(Math.random()*(i+1));
+      var t=a[i];a[i]=a[j];a[j]=t;
+    }
+    return a;
+  }
+  function esc(s){ return (s||"").replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+
+  /* ---------------- icons ---------------- */
+  var ICON = {
+    play:  '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>',
+    pause: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>',
+    next:  '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5l9 7-9 7V5zm10 0h2v14h-2z"/></svg>',
+    prev:  '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 5l-9 7 9 7V5zM6 5h2v14H6z"/></svg>'
+  };
+
+  var app = document.getElementById("app");
+
+  /* ---------------- load data ---------------- */
+  fetch(DATA_URL, {cache:"no-cache"})
+    .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+    .then(function(data){
+      var stations = normalize(data);
+      var slug = qs("theme");
+      if(slug){
+        var st = stations.filter(function(s){return s.slug===slug;})[0];
+        if(!st){ showError("Theme not found: "+esc(slug)); return; }
+        buildPlayer(st);
+      } else {
+        buildPicker(stations);
+      }
+    })
+    .catch(function(e){ showError("Could not load recordings. "+esc(e.message)); });
+
+  function normalize(data){
+    var arr = Array.isArray(data) ? data : (data.stations||[]);
+    return arr.filter(function(s){return s.clips&&s.clips.length;});
+  }
+
+  function showError(msg){
+    app.innerHTML = "";
+    app.appendChild(el("div",{class:"status err",html:msg+"<br><br>Please try again shortly."}));
+  }
+
+  /* ---------------- theme picker ---------------- */
+  function buildPicker(stations){
+    app.innerHTML="";
+    var wrap=el("div",{class:"picker"});
+    wrap.appendChild(el("h1",{text:"Narrated Memories of Danville"}));
+    wrap.appendChild(el("p",{class:"lead",text:"Choose a theme to listen. Each one shuffles through oral-history recordings from the community."}));
+    var grid=el("div",{class:"grid"});
+    stations.forEach(function(s){
+      var a=el("a",{class:"card",href:"?theme="+encodeURIComponent(s.slug),"aria-label":s.title+", "+s.clips.length+" clips"});
+      a.appendChild(el("span",{class:"t",text:s.title}));
+      a.appendChild(el("span",{class:"c",text:s.clips.length+" clips"}));
+      grid.appendChild(a);
+    });
+    wrap.appendChild(grid);
+    app.appendChild(wrap);
+  }
+
+  /* ---------------- player ---------------- */
+  function buildPlayer(station){
+    app.innerHTML="";
+    var backBtn=el("button",{class:"backbtn","aria-label":"Back to all themes",html:"← All themes"});
+    backBtn.addEventListener("click",function(){ try{audio&&audio.pause();}catch(e){} location.href=location.pathname; });
+    app.appendChild(backBtn);
+
+    // ----- photo pool -----
+    var themePhotos = (station.photos||[]).slice();
+
+    // ----- DOM -----
+    var stage = el("div",{class:"stage"});
+    var imgA = el("img",{alt:"",decoding:"async"});
+    var imgB = el("img",{alt:"",decoding:"async"});
+    var frame = el("div",{class:"frame"},[imgA,imgB]);
+    var credit = el("div",{class:"photo-credit"});
+    var caption = el("div",{class:"caption"});
+    var titleEl = el("h2",{class:"clip-title","aria-live":"polite"});
+    var speakerEl = el("p",{class:"clip-speaker"});
+    caption.appendChild(titleEl); caption.appendChild(speakerEl);
+
+    var overlay = el("div",{class:"overlay"});
+    overlay.appendChild(el("p",{class:"station-eyebrow",text:"Narrated Memories"}));
+    overlay.appendChild(el("h1",{class:"station-name",text:station.title}));
+    overlay.appendChild(el("p",{class:"station-sub",text:station.clips.length+" oral-history clips — press play to begin"}));
+    var bigBtn = el("button",{class:"bigplay","aria-label":"Play "+station.title,html:ICON.play});
+    overlay.appendChild(bigBtn);
+
+    stage.appendChild(frame);
+    stage.appendChild(credit);
+    stage.appendChild(caption);
+    stage.appendChild(overlay);
+
+    // ----- transport panel -----
+    var panel = el("div",{class:"panel"});
+    var counter = el("div",{class:"counter"});
+    var nowLbl = el("span",{class:"now",text:station.title});
+    var idxLbl = el("span",{class:"idx",text:""});
+    counter.appendChild(nowLbl); counter.appendChild(idxLbl);
+
+    var scrub = el("input",{class:"scrub",type:"range",min:"0",max:"1000",value:"0","aria-label":"Seek within clip"});
+    var times = el("div",{class:"times"});
+    var curT=el("span",{text:"0:00"}), durT=el("span",{text:"0:00"});
+    times.appendChild(curT); times.appendChild(durT);
+
+    var controls = el("div",{class:"controls"});
+    var prevBtn = el("button",{class:"ctl","aria-label":"Previous clip",html:ICON.prev});
+    var playBtn = el("button",{class:"ctl play","aria-label":"Play",html:ICON.play.replace("<svg","<svg class=\"ico-play\"")});
+    var nextBtn = el("button",{class:"ctl","aria-label":"Next clip",html:ICON.next});
+    controls.appendChild(prevBtn); controls.appendChild(playBtn); controls.appendChild(nextBtn);
+
+    panel.appendChild(counter);
+    panel.appendChild(scrub);
+    panel.appendChild(times);
+    panel.appendChild(controls);
+
+    // hidden real audio element (accessible)
+    // NOTE: no crossOrigin attr — we don't read samples, and omeka's file URLs
+    // are a different origin without CORS headers; a plain media load plays fine.
+    var audio = el("audio",{preload:"none","aria-label":"Oral history audio player"});
+
+    app.appendChild(stage);
+    app.appendChild(panel);
+    app.appendChild(audio);
+
+    /* ---------------- state ---------------- */
+    var order = [];         // shuffled indices into station.clips
+    var pos = -1;           // position in order
+    var started = false;
+    var scrubbing = false;
+    var photoTimer = null;
+    var activeImg = imgB;   // the one currently hidden (to load into next)
+    var visibleImg = imgA;
+    var curPhotoList = [];  // photos rotating for current clip
+    var curPhotoIdx = 0;
+
+    /* ---------------- photo logic ---------------- */
+    function crossfadeTo(url, altText){
+      if(!url){ return; }
+      var loader = activeImg; // hidden one
+      loader.onerror = function(){
+        loader.onerror=null;
+        // fallback: try next in rotation; if clip photo failed, drop to theme pool
+        advancePhoto(true);
+      };
+      loader.onload = function(){
+        loader.onload=null;
+        loader.style.filter="";           // clear any pre-play dim
+        loader.classList.add("show");
+        visibleImg.classList.remove("show");
+        var tmp=visibleImg; visibleImg=loader; activeImg=tmp;
+      };
+      loader.alt = altText||"";
+      loader.src = url;
+      credit.textContent = altText||"";
+      credit.classList.toggle("show", !!altText);
+    }
+    function preload(url){ if(url){ var i=new Image(); i.src=url; } }
+
+    function setPhotoContext(clip){
+      // decide the photo list for this clip
+      if(clip.photo){
+        curPhotoList = [ {src:clip.photo, alt:clip.photoAlt||clip.title} ];
+      } else if(themePhotos.length){
+        curPhotoList = themePhotos.map(function(p){
+          return (typeof p==="string") ? {src:p, alt:""} : {src:p.src, alt:p.alt||""};
+        });
+        // start at a random spot so repeated plays vary
+        curPhotoIdx = Math.floor(Math.random()*curPhotoList.length);
+      } else {
+        curPhotoList = [];
+      }
+      curPhotoIdx = curPhotoList.length ? (clip.photo?0:curPhotoIdx) : 0;
+      stopPhotoTimer();
+      if(curPhotoList.length){
+        var first = curPhotoList[curPhotoIdx % curPhotoList.length];
+        crossfadeTo(first.src, first.alt);
+        preloadNextPhoto();
+        if(curPhotoList.length>1){
+          photoTimer = setInterval(function(){ advancePhoto(false); }, PHOTO_ROTATE_MS);
+        }
+      }
+    }
+    function advancePhoto(skipCurrent){
+      if(!curPhotoList.length) return;
+      if(skipCurrent){
+        // drop the failing photo so we don't loop on it
+        curPhotoList.splice(curPhotoIdx % curPhotoList.length,1);
+        if(!curPhotoList.length){ stopPhotoTimer(); return; }
+      } else {
+        curPhotoIdx = (curPhotoIdx+1) % curPhotoList.length;
+      }
+      var p = curPhotoList[curPhotoIdx % curPhotoList.length];
+      crossfadeTo(p.src, p.alt);
+      preloadNextPhoto();
+    }
+    function preloadNextPhoto(){
+      if(curPhotoList.length>1){
+        var n = curPhotoList[(curPhotoIdx+1)%curPhotoList.length];
+        preload(n.src);
+      }
+    }
+    function stopPhotoTimer(){ if(photoTimer){ clearInterval(photoTimer); photoTimer=null; } }
+
+    /* ---------------- playback logic ---------------- */
+    function reshuffle(){
+      order = shuffle(station.clips.map(function(_,i){return i;}));
+      pos = -1;
+    }
+    function currentClip(){ return station.clips[order[pos]]; }
+
+    function loadAndPlay(clip){
+      titleEl.textContent = clip.title;
+      speakerEl.textContent = clip.speaker ? clip.speaker : "";
+      idxLbl.textContent = (pos+1)+" of "+order.length;
+      nowLbl.textContent = station.title;
+      curT.textContent="0:00"; durT.textContent="0:00";
+      setScrub(0);
+      setPhotoContext(clip);
+      audio.src = clip.mp3;
+      audio.load();
+      var p = audio.play();
+      if(p&&p.catch) p.catch(function(){ /* autoplay/interruption; user can press play */ });
+    }
+
+    function playIndex(){
+      if(pos<0||pos>=order.length) return;
+      loadAndPlay(currentClip());
+    }
+    function next(){
+      pos++;
+      if(pos>=order.length){ reshuffle(); pos=0; } // loop-shuffle
+      playIndex();
+    }
+    function prev(){
+      if(audio.currentTime>3){ audio.currentTime=0; return; }
+      pos--;
+      if(pos<0){ pos=0; }
+      playIndex();
+    }
+    function startFromBeginning(){
+      started=true;
+      overlay.classList.add("hide");
+      reshuffle();
+      next();
+    }
+    function togglePlay(){
+      if(!started){ startFromBeginning(); return; }
+      if(audio.paused){ var p=audio.play(); if(p&&p.catch)p.catch(function(){}); }
+      else audio.pause();
+    }
+
+    /* ---------------- scrubber ---------------- */
+    function setScrub(frac){
+      var v = Math.round(frac*1000);
+      scrub.value = v;
+      scrub.style.setProperty("--pct",(frac*100)+"%");
+    }
+    audio.addEventListener("timeupdate",function(){
+      if(scrubbing) return;
+      if(audio.duration){ setScrub(audio.currentTime/audio.duration); }
+      curT.textContent = fmt(audio.currentTime);
+    });
+    audio.addEventListener("loadedmetadata",function(){
+      durT.textContent = fmt(audio.duration);
+    });
+    audio.addEventListener("durationchange",function(){
+      durT.textContent = fmt(audio.duration);
+    });
+    audio.addEventListener("ended",function(){ next(); });
+    audio.addEventListener("error",function(){
+      // skip broken clip after a short beat
+      speakerEl.textContent = "…skipping unavailable clip";
+      setTimeout(next, 700);
+    });
+    audio.addEventListener("play",function(){
+      playBtn.innerHTML = ICON.pause;
+      playBtn.setAttribute("aria-label","Pause");
+      bigBtn.innerHTML = ICON.pause;
+    });
+    audio.addEventListener("pause",function(){
+      playBtn.innerHTML = ICON.play.replace("<svg","<svg class=\"ico-play\"");
+      playBtn.setAttribute("aria-label","Play");
+      bigBtn.innerHTML = ICON.play;
+    });
+
+    scrub.addEventListener("input",function(){
+      scrubbing=true;
+      var frac = scrub.value/1000;
+      scrub.style.setProperty("--pct",(frac*100)+"%");
+      if(audio.duration) curT.textContent = fmt(frac*audio.duration);
+    });
+    function commitScrub(){
+      if(audio.duration){ audio.currentTime = (scrub.value/1000)*audio.duration; }
+      scrubbing=false;
+    }
+    scrub.addEventListener("change",commitScrub);
+    scrub.addEventListener("mouseup",commitScrub);
+    scrub.addEventListener("touchend",commitScrub);
+
+    /* ---------------- buttons ---------------- */
+    bigBtn.addEventListener("click",startFromBeginning);
+    playBtn.addEventListener("click",togglePlay);
+    nextBtn.addEventListener("click",function(){ if(!started){ startFromBeginning(); } else { next(); } });
+    prevBtn.addEventListener("click",function(){ if(started) prev(); });
+
+    /* ---------------- keyboard ---------------- */
+    document.addEventListener("keydown",function(e){
+      if(e.target && (e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA")) {
+        if(e.code==="Space") return; // let range handle
+      }
+      if(e.code==="Space"){ e.preventDefault(); togglePlay(); }
+      else if(e.code==="ArrowRight"){ if(started){ e.preventDefault(); next(); } }
+      else if(e.code==="ArrowLeft"){ if(started){ e.preventDefault(); prev(); } }
+    });
+
+    // set a quiet initial backdrop from the theme pool (before play)
+    if(themePhotos.length){
+      var p0 = themePhotos[Math.floor(Math.random()*themePhotos.length)];
+      var u0 = (typeof p0==="string")?p0:p0.src;
+      var probe = new Image();
+      probe.onload=function(){ imgA.src=u0; imgA.classList.add("show"); imgA.style.filter="saturate(.8) brightness(.7)"; };
+      probe.src=u0;
+    }
+  }
+})();
+</script>
+</body>
+</html>
