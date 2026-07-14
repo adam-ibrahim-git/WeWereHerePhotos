@@ -62,6 +62,11 @@
   window.addEventListener("load",reportHeight);
   window.addEventListener("resize",function(){ clearTimeout(window.__rt); window.__rt=setTimeout(reportHeight,150); });
   setTimeout(reportHeight,300); setTimeout(reportHeight,1200);
+  // If this page is restored from the browser's back/forward cache — Safari and
+  // Firefox keep the frozen, still-"playing" YouTube frame even though omeka.net
+  // sends Cache-Control:no-store, so the restored player can pop into fullscreen
+  // when you hit Back — reload it so it returns fresh, inline, paused, reshuffled.
+  window.addEventListener("pageshow",function(e){ if(e.persisted){ location.reload(); } });
 </script>
 </body>
 </html>
