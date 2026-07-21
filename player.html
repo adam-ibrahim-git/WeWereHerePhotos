@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>We Were Here — Narrated Memories</title>
+<title>We Were Here - Narrated Memories</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -47,7 +47,7 @@
   .chip svg{width:14px;height:14px;fill:var(--gold)}
   .foot{padding:12px 16px;font-size:.8rem;color:var(--lavender);border-top:1px solid var(--line);line-height:1.45}
   .foot b{color:var(--offwhite);font-weight:600}
-  /* -------- Stage (photo) — flush inside the card -------- */
+  /* -------- Stage (photo) - flush inside the card -------- */
   .stage{
     position:relative;width:100%;
     aspect-ratio:4/3;
@@ -132,7 +132,7 @@
   .bigplay:hover{background:rgba(201,162,75,.26);transform:scale(1.05)}
   .bigplay:active{transform:scale(.97)}
   .bigplay svg{width:34px;height:34px;margin-left:4px}
-  /* -------- Transport controls — flush inside the card -------- */
+  /* -------- Transport controls - flush inside the card -------- */
   .panel{
     background:transparent;border:none;border-radius:0;margin:0;
     padding:12px 16px 15px;
@@ -188,7 +188,7 @@
   .ctl.play:hover{background:rgba(201,162,75,.2)}
   .ctl.play svg{width:28px;height:28px}
   .ctl.play svg.ico-play{margin-left:3px}
-  /* -------- Theme picker (no ?theme=) — the card body -------- */
+  /* -------- Theme picker (no ?theme=) - the card body -------- */
   .picker{padding:16px}
   .picker .grid{display:flex;flex-direction:column;gap:9px}
   .picker a.card{
@@ -346,7 +346,7 @@
     body.appendChild(grid);
     shell.appendChild(body);
 
-    shell.appendChild(el("div",{class:"foot",html:"Each theme shuffles through the community’s oral-history recordings — every clip paired with a photograph from the collection."}));
+    shell.appendChild(el("div",{class:"foot",html:"Each theme shuffles through the community’s oral-history recordings - every clip paired with a photograph from the collection."}));
     app.appendChild(shell);
     reportHeight();
   }
@@ -384,7 +384,7 @@
     var overlay = el("div",{class:"overlay"});
     var bigBtn = el("button",{class:"bigplay","aria-label":"Play "+station.title,html:ICON.play});
     overlay.appendChild(bigBtn);
-    overlay.appendChild(el("p",{class:"station-sub",text:station.clips.length+" oral-history clips — press play"}));
+    overlay.appendChild(el("p",{class:"station-sub",text:station.clips.length+" oral-history clips - press play"}));
 
     stage.appendChild(bg);
     stage.appendChild(frame);
@@ -416,7 +416,7 @@
     panel.appendChild(controls);
 
     // hidden real audio element (accessible)
-    // NOTE: no crossOrigin attr — we don't read samples, and omeka's file URLs
+    // NOTE: no crossOrigin attr - we don't read samples, and omeka's file URLs
     // are a different origin without CORS headers; a plain media load plays fine.
     var audio = el("audio",{preload:"none","aria-label":"Oral history audio player"});
 
@@ -620,7 +620,7 @@
       else if(e.code==="ArrowLeft"){ if(started){ e.preventDefault(); prev(); } }
     });
 
-    // set a quiet initial backdrop (before play) — prefer the first clip's own
+    // set a quiet initial backdrop (before play) - prefer the first clip's own
     // photo so the opening image already belongs to a recording
     (function(){
       var seed = (station.clips[0] && station.clips[0].photo) ||

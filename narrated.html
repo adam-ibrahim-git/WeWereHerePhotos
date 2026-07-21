@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>We Were Here — Narrated Photographs</title>
+<title>We Were Here - Narrated Photographs</title>
 <style>
   :root{--aubergine:#2E1A47;--purple:#512A80;--gold:#C9A24B;--offwhite:#F5F2FA;--lavender:#BEB0D6;--line:rgba(190,176,214,.28);}
   *{box-sizing:border-box}
@@ -47,7 +47,7 @@
   // Fisher-Yates shuffle so the order is different every visit.
   for(var i=IDS.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=IDS[i];IDS[i]=IDS[j];IDS[j]=t;}
   // Click-to-play facade: no YouTube frame exists until the visitor asks for one.
-  // (Autoplay is off anyway, so the visitor already had to click — this just means the
+  // (Autoplay is off anyway, so the visitor already had to click - this just means the
   // heavy cross-origin embed isn't sitting in the page, and history, the whole time.)
   var stage=document.getElementById('stage');
   var poster=document.getElementById('poster');
@@ -56,7 +56,7 @@
     if(frame) return;
     frame=document.createElement('iframe');
     frame.className='ytframe';
-    frame.title='Narrated photographs — shuffled';
+    frame.title='Narrated photographs - shuffled';
     frame.setAttribute('allow','autoplay; encrypted-media; picture-in-picture; fullscreen');
     frame.setAttribute('allowfullscreen','');
     frame.src="https://www.youtube.com/embed/"+IDS[0]+"?playlist="+IDS.slice(1).join(',')+"&rel=0&modestbranding=1&playsinline=1&loop=1&autoplay=1";
@@ -72,7 +72,7 @@
   function teardown(){ if(frame){ frame.src='about:blank'; frame.remove(); frame=null; stage.innerHTML=''; stage.appendChild(poster); } }
   window.addEventListener('pagehide',teardown);
   // Report the card's exact height to a hosting page so it can size the iframe
-  // precisely (no letterboxing / clipping at any width). Height only — non-sensitive.
+  // precisely (no letterboxing / clipping at any width). Height only - non-sensitive.
   function reportHeight(){
     try{
       var c=document.querySelector('.card');
